@@ -78,5 +78,45 @@ class RentalController extends Controller
     }
    }
 
-   
+//    public function generateRentalContract(Request $request, $storeId)
+// {
+//     // Validate the request data
+//     $validatedData = $request->validate([
+//         'customer_name' => 'required|string',
+//         'customer_email' => 'required|email',
+//         'rental_duration' => 'required|integer',
+//         'rental_start_date' => 'required|date',
+//     ]);
+
+//     // Find the store
+//     $store = Store::findOrFail($storeId);
+
+//     // Create a new rental contract
+//     $rentalContract = new RentalContract();
+//     $rentalContract->store_id = $store->id;
+//     $rentalContract->customer_name = $validatedData['customer_name'];
+//     $rentalContract->customer_email = $validatedData['customer_email'];
+//     $rentalContract->rental_duration = $validatedData['rental_duration'];
+//     $rentalContract->rental_start_date = $validatedData['rental_start_date'];
+//     $rentalContract->save();
+
+//     // Generate the rental contract PDF
+//     $pdf = PDF::loadView('rental-contract', [
+//         'store' => $store,
+//         'rentalContract' => $rentalContract,
+//     ]);
+
+//     // Return the PDF for download
+//     return $pdf->download('rental-contract.pdf');
+// }
+// Route::post('/stores/{storeId}/rental-contract', [StoreController::class, 'generateRentalContract'])->name('stores.rental-contract');
+// public function generateMatricule()
+// {
+//     // Generate a unique matricule for the store
+//     $lastStore = Store::orderBy('id', 'desc')->first();
+//     $lastMatricule = $lastStore ? $lastStore->matricule : 0;
+//     $newMatricule = $lastMatricule + 1;
+//     return 'STORE-' . str_pad($newMatricule, 4, '0', STR_PAD_LEFT);
+// }
+
 }

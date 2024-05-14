@@ -14,8 +14,9 @@ return new class extends Migration
     public function up():void
     {
         Schema::create('stores', function (Blueprint $table) {
-            $table->id('number');
+            $table->id();
             $table->string('name');
+            $table->string('matricule');
             $table->unsignedBigInteger('bloc_id');
             $table->string('city');
             $table->string('district');

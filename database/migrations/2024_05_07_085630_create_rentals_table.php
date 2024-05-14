@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('period_location'); // Assuming period_location is an integer representing duration in days, weeks, etc.
             $table->dateTime('rental_date');
             $table->decimal('price_store', 8, 2); // Assuming price_store can have decimals with up to 2 decimal places
-            $table->foreign('store_matricule')->references('number')->on('stores');
+            $table->foreign('store_matricule')->references('id')->on('stores');
 
             $table->timestamps();
         });

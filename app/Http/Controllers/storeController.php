@@ -1,24 +1,29 @@
 <?php
 namespace App\Http\Controllers;
-
+use App\Http\Resources\storerRessources;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\storesRequest;
 use App\Models\Store;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class  StoreController extends Controller
 {
     public function index()
     {
-        $stores = Store::all();
-        return response()->json($stores, Response::HTTP_OK);
+        $store= new Store() ;
+        return storerRessources::collection($store::all())  ;
+    
+        
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'number' => $this->generateMatricule(),
+        'matricule' => $this->generateMatricule(),
         'bloc_id' => 'required|integer|exists:blocs,id',
         'city' => 'required|string|max:255',
         'district' => 'required|string|max:255',
@@ -26,18 +31,18 @@ class  StoreController extends Controller
         'latitude' => 'required|numeric',
         'status' => 'required|boolean',
     ]);
-       
-        $store = Store::create($request->all($validatedData));
-        $store->name = $request->name;
-        $store->number = $request->number;
-        $store->bloc_id = $request->bloc_id;
-        $store->city = $request->city;
-        $store->district = $request->district;
-        $store->longitude = $request->longitude;
-        $store->latitude = $request->latitude;
-        $store->status = $request->status;
+
+    try {
+        $store = new Store();
+
+        $store->fill($validatedData) ;
+        $store->matricule = $this->generateMatricule();
         $store->save();
-        return response()->json($store, Response::HTTP_CREATED);
+        
+        return  new  storerRessources($store);
+    } catch(\Exception $exception) {
+        throw new HttpException(400, "Invalid data - {'message' => {$exception->getMessage()}");
+    }
     }
     private function generateMatricule()
 {
@@ -47,35 +52,51 @@ class  StoreController extends Controller
     return $base . substr($uniqueSuffix, 0, 8); 
 }
 
-    public function show(Store $store)
+    public function show($id)
     {
+        $store = Store::findOrfail($id);
         if (!is_null($store)) {
-            return response()->json($store, Response::HTTP_OK);
+            return response()->json($store);
         } else {
             return response()->json(["message" => "Store not found"], Response::HTTP_NOT_FOUND);
         }
     }
 
-    public function update(Request $request, Store $store)
+    public function update(Request $request, $id)
     {
-        if (!is_null($store)) {
-            $store->name = $request->has('name') ? $request->name : $store->name;
-            $store->number = $request->has('number') ? $request->number : $store->number;
-            $store->bloc_id = $request->has('bloc_id') ? $request->bloc_id : $store->bloc_id;
-            $store->city = $request->has('city') ? $request->city : $store->city;
-            $store->district = $request->has('district') ? $request->district : $store->district;
-            $store->longitude = $request->has('longitude') ? $request->longitude : $store->longitude;
-            $store->latitude = $request->has('latitude') ? $request->latitude : $store->latitude;
-            $store->status = $request->has('status') ? $request->status : $store->status;
-            $store->save();
-            return response()->json(["message" => "Store updated successfully"], Response::HTTP_OK);
-        } else {
-            return response()->json(["message" => "Store not found"], Response::HTTP_NOT_FOUND);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'matricule' => $this->generateMatricule(),
+            'bloc_id' => 'required|integer|exists:blocs,id',
+            'city' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'longitude' => 'required|numeric',
+            'latitude' => 'required|numeric',
+            'status' => 'required|boolean',
+        ]);
+        if (!$id) {
+            throw new HttpException(400, "Invalid id");
         }
+
+        try {
+           $store = Store::find($id); 
+           $store->fill($validatedData);
+           $store->matricule = $this->generateMatricule();
+           $store->save();
+
+           return new storerRessources ($store) ;
+           return response()->json(["message" => "Store updated successfully"], Response::HTTP_OK);
+
+        } catch(\Exception $exception) {
+           throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
+        }
+            
+
     }
 
-    public function destroy(Store $store)
+    public function destroy($id)
     {
+        $store = Store::find($id); 
         if (!is_null($store)) {
             $store->delete();
             return response()->json(["message" => "Store deleted successfully"], Response::HTTP_OK);
