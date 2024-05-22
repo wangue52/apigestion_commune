@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use League\CommonMark\Reference\Reference;
 
 return new class extends Migration
 {
@@ -11,12 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('type_taxes', function (Blueprint $table) {
+        Schema::create('save_qrcodes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->double('taux');
-            $table->string('description');
+            $table->unsignedInteger('storeId');
+            $table->string('QRcodeImage')->nullable() ;
+            $table->string('key')->unique();
             $table->timestamps();
+            $table->foreign('storeId')->references('id')->on('stores') ;
+
         });
     }
 
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('type_taxes');
+        Schema::dropIfExists('save_qrcodes');
     }
 };

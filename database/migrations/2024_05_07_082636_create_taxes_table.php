@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('taxes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('taxe_id');
+            $table->integer('userId');
+            $table->enum('status', ['payer', 'nom payer']);
+            $table->datetimes('validity_duration');
             $table->timestamps();
+            $table->foreign('taxe_id')->references('id')->on('type_taxes');
+
         });
     }
 

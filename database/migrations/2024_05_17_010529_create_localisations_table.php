@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('localisations', function (Blueprint $table) {
             $table->id();
             $table->integer('store_id');
-            $table->double('longitude_id');
-            $table->double('latitude_id');
+            $table->integer('longitude_id');
+            $table->integer('latitude_id');
             $table->timestamps();
             $table->foreign('longitude_id')->references('longitude')->on('stores');
             $table->foreign('latitude_id')->references('latitude')->on('stores');

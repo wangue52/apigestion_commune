@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class typeTaxe extends Model
 {
@@ -12,7 +13,8 @@ class typeTaxe extends Model
         'nom',
         'taux',
         'description',
-        'status',
-        'created_at',
     ] ;
+    public function taxe(){
+        return $this->BelongsTo(taxe::class);
+    }
 }
