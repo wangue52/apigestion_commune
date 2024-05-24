@@ -16,13 +16,13 @@ class Store extends Model
      */
     protected $fillable = [
         'name',
-        'number',
+        'matricule',
         'bloc_id',
         'city',
         'district',
         'longitude',
         'latitude',
-        'status',
+        'status', 
     ];
 
     /**

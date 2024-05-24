@@ -7,6 +7,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\BlocController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\loginController;
+use GuzzleHttp\Client;
 
 
 
@@ -48,9 +49,21 @@ Route::group(['prefix' => 'blocs'], function ()  {
         Route::get('/', [RentalController::class, 'index']);
         Route::post('/', [RentalController::class, 'store']);
     });
-Route::group(['prefix' => 'auth'], function () {
-    Route::post('/login', [loginController::class, 'login']);
-    Route::post('/forget-password', [loginController::class, 'forgetPassword']);
-    Route::post('/logout', [loginController::class, 'logout']);
-});
+    Route::get('rental/qrcode/{data}', 'RentalController@getQrCodeData')->name('rental.qrcode');
+    // Route::get('location', function (Request $request) {
+    //     $ipAddress = $request->ip();
     
+    //     $client = new Client();
+    //     $response = $client->get('https://ipinfo.io/' . $ipAddress, [
+    //         'headers' => [
+    //             'X-API-KEY' => env('ipinfo.io/[IP address]?token=20de5a57df4785'),
+    //         ],
+    //     ]);
+    
+    //     $locationData = json_decode($response->getBody()->getContents());
+    
+    //     return response()->json([
+    //         'latitude' => $locationData->loc->lat,
+    //         'longitude' => $locationData->loc->lon,
+    //     ]);
+    // });

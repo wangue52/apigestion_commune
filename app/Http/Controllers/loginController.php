@@ -103,13 +103,9 @@ class loginController extends Controller
             'token' => $token,
             'url' => route('password.reset', ['token' => $token]),
         ];
-    
-        // Send email using appropriate mailer service
-        // (Replace with your preferred email sending mechanism)
+           
         Mail::to($user->email)->send(new PasswordResetEmail($user, $token, $emailData['url']));
     }
 }
-
-
 
 

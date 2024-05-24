@@ -23,13 +23,13 @@ class storesRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'number' => $this->generateMatricule(),
+            'matricule' => 'nullable',
             'bloc_id' => 'required|integer|exists:blocs,id',
             'city' => 'required|string|max:255',
             'district' => 'required|string|max:255',
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
-            'status' => 'required|boolean',
+            'status' => 'required|in:indisponible,disponible,renovations',
         ];
     }
     public function messages()

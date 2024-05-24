@@ -16,15 +16,15 @@ class storerRessources extends JsonResource
     {
         return  [
             'name' => $this->name,
-            'number' => $this->number,
+            'matricule' => $this->matricule,
             'bloc_id' => $this->bloc_id,
             'city' => $this->city,
             'district' => $this->district,
             'longitude' => $this->longitude,
             'latitude' => $this->latitude,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
+            'status' => $this->status === 'indisponible' ? 'indisponible' : ($this->status === 'disponible' ? 'disponible': 'renovations'), 
+            // 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            // 'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+     ];
     }
 }

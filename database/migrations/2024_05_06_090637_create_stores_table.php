@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('matricule');
+            $table->string('matricule')->nullable();
             $table->unsignedBigInteger('bloc_id');
             $table->string('city');
             $table->string('district');
             $table->double('longitude');
             $table->double('latitude');
-            $table->enum('status', ['disponible', 'indisponible']);
+            $table->enum('status', [ 'indisponible', 'disponible' , 'renovations'])->default('indisponible');
             $table->timestamps();
 
             $table->foreign('bloc_id')->references('id')->on('blocs');

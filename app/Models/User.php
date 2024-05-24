@@ -46,6 +46,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function scopeWhereEmail($query, $email)
+{
+    return $query->where('email', $email);
+}
     public function agent()
     {
         return $this->hasOne(agent::class);

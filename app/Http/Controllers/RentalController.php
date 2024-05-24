@@ -1,14 +1,16 @@
 <?php
 
 namespace App\Http\Controllers ;
-
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+use BaconQrCode\Renderer\RendererStyle\Fill;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Rental;
-use Intervention\Image\Image\ImageManager ;
-use BaconQrCode\Writer;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\Color\Rgb;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class RentalController extends Controller
 {
@@ -77,46 +79,68 @@ class RentalController extends Controller
         return response()->json(['message' => 'Rental not found'], 404);
     }
    }
+   public function generateQrCode($id)
+{     $rental = Rental::find($id);
+    $data = [
+        'store_id' => $rental->store_id,
+        'rent_expiration' => $rental->rent_expiration,
+        'payment_status' => $rental->payment_status,
+       
+    ];
 
-//    public function generateRentalContract(Request $request, $storeId)
-// {
-//     // Validate the request data
-//     $validatedData = $request->validate([
-//         'customer_name' => 'required|string',
-//         'customer_email' => 'required|email',
-//         'rental_duration' => 'required|integer',
-//         'rental_start_date' => 'required|date',
-//     ]);
+    $url = route('rental.qrcode', ['data' => json_encode($data)]);
 
-//     // Find the store
-//     $store = Store::findOrFail($storeId);
+    $renderer = new ImageRenderer(
+        new RendererStyle(400, 1, null, null, Fill::uniformColor(new Rgb(0, 255, 0), new Rgb(0, 0, 0) )),
+        new ImagickImageBackEnd()
+    );
 
-//     // Create a new rental contract
-//     $rentalContract = new RentalContract();
-//     $rentalContract->store_id = $store->id;
-//     $rentalContract->customer_name = $validatedData['customer_name'];
-//     $rentalContract->customer_email = $validatedData['customer_email'];
-//     $rentalContract->rental_duration = $validatedData['rental_duration'];
-//     $rentalContract->rental_start_date = $validatedData['rental_start_date'];
-//     $rentalContract->save();
+    $writer = new Writer($renderer);
+    $qrCode = $writer->writeString($url);
 
-//     // Generate the rental contract PDF
-//     $pdf = PDF::loadView('rental-contract', [
-//         'store' => $store,
-//         'rentalContract' => $rentalContract,
-//     ]);
+    $filename = 'qrcode_'. time(). '.png';
+    $filepath = public_path('qrcodes/'. $filename);
 
-//     // Return the PDF for download
-//     return $pdf->download('rental-contract.pdf');
-// }
-// Route::post('/stores/{storeId}/rental-contract', [StoreController::class, 'generateRentalContract'])->name('stores.rental-contract');
-// public function generateMatricule()
-// {
-//     // Generate a unique matricule for the store
-//     $lastStore = Store::orderBy('id', 'desc')->first();
-//     $lastMatricule = $lastStore ? $lastStore->matricule : 0;
-//     $newMatricule = $lastMatricule + 1;
-//     return 'STORE-' . str_pad($newMatricule, 4, '0', STR_PAD_LEFT);
-// }
+    file_put_contents($filepath, $qrCode);
 
+    return response()->json([
+        'qrcode_url' => url('qrcodes/'. $filename),
+        'data' => $data
+    ]);
 }
+   public function getQrCodeData(Request $request)
+{
+    $data = json_decode($request->data, true);
+
+    $rental = Rental::where('store_id', $data['store_id'])
+        ->where('rent_expiration', $data['rent_expiration'])
+        ->where('payment_status', $data['payment_status'])
+        ->first();
+    if ($rental) {
+        return response()->json($rental);
+    } else {
+        return response()->json(['message' => 'Rental not found'], 404);
+    }
+}
+    public function generatePdf($id)
+    {
+        $rental = Rental::find($id);
+
+        if ($rental) {
+            $qrCode = $this->generateQrCode($id);
+
+            $pdf = PDF::loadView('pdf.rental', [
+                'rental' => $rental,
+                'qrCode' => $qrCode,
+            ]);
+
+            return $pdf->download('rental_details_'. $rental->client_name. '.pdf');
+        } else {
+            return response()->json(['message' => 'Rental not found'], 404);
+        }
+    }
+
+    //...
+}
+
+//

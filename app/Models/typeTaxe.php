@@ -15,6 +15,6 @@ class typeTaxe extends Model
         'description',
     ] ;
     public function taxe(){
-        return $this->BelongsTo(taxe::class);
+        return $this->hasMany(taxe::class);
     }
 }

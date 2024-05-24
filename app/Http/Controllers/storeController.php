@@ -19,38 +19,27 @@ class  StoreController extends Controller
         
     }
 
-    public function store(Request $request)
+    public function store(storesRequest $request)
     {
-        $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'matricule' => $this->generateMatricule(),
-        'bloc_id' => 'required|integer|exists:blocs,id',
-        'city' => 'required|string|max:255',
-        'district' => 'required|string|max:255',
-        'longitude' => 'required|numeric',
-        'latitude' => 'required|numeric',
-        'status' => 'required|boolean',
-    ]);
 
-    try {
-        $store = new Store();
-
-        $store->fill($validatedData) ;
-        $store->matricule = $this->generateMatricule();
-        $store->save();
-        
-        return  new  storerRessources($store);
-    } catch(\Exception $exception) {
-        throw new HttpException(400, "Invalid data - {'message' => {$exception->getMessage()}");
-    }
-    }
-    private function generateMatricule()
-{
     
-    $base = "NDEB";
-    $uniqueSuffix = uniqid('', true); 
-    return $base . substr($uniqueSuffix, 0, 8); 
-}
+        $store =Store::create($request->validated());
+        $matricule= $this->generateMatricule($store->id);
+        $store->matricule=$matricule ;
+        $store->update(['matricule' =>$matricule]);
+        return new storerRessources($store->fresh()) ;
+    }
+        
+    public function generateMatricule($id)
+    {
+        $store = Store::findOrfail($id);
+        $prefix = substr($store->name, 0, 3);
+        $count = Store::whereYear('created_at', date('Y'))->count() + 1;
+        $matricule = $prefix . date('y') . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        return $matricule;
+    }
+    
 
     public function show($id)
     {
@@ -62,35 +51,10 @@ class  StoreController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(storesRequest $request, Store $store)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'matricule' => $this->generateMatricule(),
-            'bloc_id' => 'required|integer|exists:blocs,id',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'longitude' => 'required|numeric',
-            'latitude' => 'required|numeric',
-            'status' => 'required|boolean',
-        ]);
-        if (!$id) {
-            throw new HttpException(400, "Invalid id");
-        }
-
-        try {
-           $store = Store::find($id); 
-           $store->fill($validatedData);
-           $store->matricule = $this->generateMatricule();
-           $store->save();
-
-           return new storerRessources ($store) ;
-           return response()->json(["message" => "Store updated successfully"], Response::HTTP_OK);
-
-        } catch(\Exception $exception) {
-           throw new HttpException(400, "Invalid data - {$exception->getMessage()}");
-        }
-            
+        $store->update($request->validated());
+        return new storerRessources($store);        
 
     }
 
