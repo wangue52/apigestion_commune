@@ -9,4 +9,5 @@ class saveQrcode extends Model
 {
     use HasFactory;
     protected $fillable = ['data', 'qrcode_url', ];
+    
 }

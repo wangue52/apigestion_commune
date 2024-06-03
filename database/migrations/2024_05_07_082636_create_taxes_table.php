@@ -16,11 +16,10 @@ return new class extends Migration
             $table->unsignedInteger('taxe_id');
             $table->integer('userId');
             $table->enum('status', ['payer', 'nom payer']);
-            $table->datetimes('validity_duration');
             $table->timestamps();
             $table->foreign('taxe_id')->references('id')->on('type_taxes');
             $table->foreign('userId')->references('id')->on('users');
-            
+
         });
     }
 

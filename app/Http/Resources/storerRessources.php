@@ -15,6 +15,7 @@ class storerRessources extends JsonResource
     public function toArray(Request $request): array
     {
         return  [
+            'id' => $this->id,
             'name' => $this->name,
             'matricule' => $this->matricule,
             'bloc_id' => $this->bloc_id,

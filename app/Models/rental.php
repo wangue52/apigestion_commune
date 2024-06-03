@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\LaravelPdf\Facades\Pdf;
 class rental extends Model
 {
     use HasFactory;
@@ -20,4 +20,18 @@ class rental extends Model
 
 
     ] ;
+    public function scopeWithStoreId($query, $storeId)
+{
+    return $query->where('store_id', $storeId);
+}
+
+public function scopeWithRentExpiration($query, $rentExpiration)
+{
+    return $query->where('rent_expiration', $rentExpiration);
+}
+
+public function scopeWithPaymentStatus($query, $paymentStatus)
+{
+    return $query->where('payment_status', $paymentStatus);
+}
 }

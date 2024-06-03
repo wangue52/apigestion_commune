@@ -19,11 +19,14 @@ class userRessource extends JsonResource
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
-            'type' => $this->type,
+            'password' => bcrypt($this->password),
+            'type' => $this->type === 'agent' ? 'agent' : ($this->type === 'receveur' ? 'receveur': 'receveur'),
             'phone' => $this->phone,
             'address' => $this->address,
-            'avatar' => $this->avatar,
+            'avatar' => $this->avatar , // Store avatar if provided
             'matricule' => $this->matricule,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

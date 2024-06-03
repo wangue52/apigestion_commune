@@ -23,13 +23,14 @@ class userRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'type' => 'required|integer',
+            'username' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8', // Enforce minimum password length
+            'type' => 'required|in:agent,receveur,renovations',
             'phone' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'avatar' => 'nullable|string|max:255',
-            'matricule' => 'required|string|max:255|unique:users',
+            'avatar' => 'nullable|image', // Validate for image format
+            'matricule' => 'nullable|string|max:255',
         ];
     }
 }

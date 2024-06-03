@@ -8,21 +8,21 @@ use App\Models\Bloc;
 use Illuminate\Http\Response;
 
 
-class BlocController extends Controller
+class BlocControler extends Controller
 {
   public function index()
   {
     $bloc1= Bloc::all();
     return response()->json($bloc1, Response::HTTP_OK );
-    
+
   }
-  public function  bloc(Request $request){
+  public function  store(Request $request){
     $bloc1 = Bloc::create($request->all());
     $bloc1->name=$request->name ;
     $bloc1->number_shop=$request->number_shop ;
     $bloc1->save() ;
     return response()->json($bloc1, Response::HTTP_OK);
-    
+
   }
   public function show(Request $request){
     $bloc1 = Bloc::find($request->id);
