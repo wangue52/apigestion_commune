@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('rentals', function (Blueprint $table) {
             $table->id('rental_id'); // Assuming you want an auto-incrementing primary key
             $table->string('client_name');
-            $table->string('store_matricule'); // Assuming store_matricule is unique for identification
+            $table->string('store_matricule'); 
             $table->string('store_name');
             $table->string('store_address');
-            $table->integer('period_location'); // Assuming period_location is an integer representing duration in days, weeks, etc.
+            $table->integer('period_location'); // Assuming period_locon in days, weeks, etc.
             $table->dateTime('rental_date');
             $table->decimal('price_store', 8, 2); // Assuming price_store can have decimals with up to 2 decimal places
             $table->foreign('store_matricule')->references('id')->on('stores');

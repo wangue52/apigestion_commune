@@ -43,13 +43,9 @@ class BlocControler extends Controller
         return response()->json(["message" => "le bloc n'existe pas"], Response::HTTP_NOT_FOUND);
     }
   }
-  public function destroy(Request $request){
-    $bloc1 = Bloc::find($request->id);
-    if (!is_null($bloc1)) {
-        $bloc1->delete();
-        return response()->json(["message" => "le bloc n'existe pas"], Response::HTTP_OK);
-    } else {
-        return response()->json(["message" => "le bloc n'existe pas"], Response::HTTP_NOT_FOUND);
-    }
+  public function destroy($id) {
+    $bloc1 = Bloc::find($id);
+    $bloc1->delete();
+    return response()->json(['message' => 'User deleted']);
   }
 }

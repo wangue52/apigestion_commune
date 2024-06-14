@@ -46,7 +46,7 @@ Route::group(['prefix' => 'blocs'], function ()  {
 
     Route::get('/{bloc}', [BlocControler::class, 'show']);
     Route::put('/{bloc}', [BlocControler::class, 'update']);
-    Route::delete('/{bloc}', [BlocControler::class, 'destroy']);
+    Route::delete('bloc/{id}', [BlocControler::class, 'destroy']);
 });
     Route::prefix('rentals')->group(function () {
         Route::get('/', [RentalController::class, 'index']);

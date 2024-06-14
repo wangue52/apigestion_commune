@@ -88,6 +88,7 @@ class registerController extends Controller
     return response()->json([
     'accessToken' =>$token,
     'token_type' => 'Bearer',
+    'type' =>$user->type ,
     ]);
 }
 public function user(Request $request)
