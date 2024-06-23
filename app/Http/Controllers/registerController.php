@@ -53,7 +53,8 @@ class registerController extends Controller
        return response()->json([
         'data'          => $user,
          'access_token'  => $token,
-         'token_type'    => 'Bearer'
+         'token_type'    => 'Bearer',
+         'profil' => $profilePicturePath,
      ]);
     }
 

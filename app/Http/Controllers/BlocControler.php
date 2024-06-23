@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Bloc;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Validator;
 
 class BlocControler extends Controller
 {
@@ -17,15 +17,24 @@ class BlocControler extends Controller
 
   }
   public function  store(Request $request){
-    $bloc1 = Bloc::create($request->all());
-    $bloc1->name=$request->name ;
-    $bloc1->number_shop=$request->number_shop ;
-    $bloc1->save() ;
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'number_shop' => 'required|string|max:255'
+    ]);
+    if ($validator->fails()) {
+        return response()->json($validator->errors());
+      };
+
+    $bloc1 = Bloc::create([
+        'name' =>$request->name ,
+        'number_shop'=>$request->number_shop
+
+    ]);
     return response()->json($bloc1, Response::HTTP_OK);
 
   }
-  public function show(Request $request){
-    $bloc1 = Bloc::find($request->id);
+  public function show( $id){
+    $bloc1 = Bloc::find($id);
     if (!is_null($bloc1)) {
         return response()->json($bloc1, Response::HTTP_OK);
     } else {

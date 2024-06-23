@@ -10,8 +10,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Rental;
 use BaconQrCode\Renderer\Color\Rgb;
-use Spatie\LaravelPdf\Facades\Pdf;
-
+use Spatie\LaravelPdf\PdfBuilder;
+use Barryvdh\DomPDF\Facade\Pdf ;
 class RentalController extends Controller
 {
     public function index()
@@ -28,21 +28,20 @@ class RentalController extends Controller
         $validatedData = $request->validate($request->all(), [
             'client_name' => 'required|string|max:255',
             'store_matricule' => 'required|string|unique:stores,number', // Assuming 'number' is the unique identifier in the 'stores' table
-            'store_name' => 'required|string|max:255',
             'store_address' => 'required|string|max:255',
             'period_location' => 'required|integer',
             'rental_date' => 'required|date_format:Y-m-d H:i:s',
             'price_store' => 'required|numeric|between:0.01,999999.99', // Allow prices from 0.01 to 999,999.99
         ]);
-        $rental = Rental::create($request->all());
-        $rental->client_name=$request->client_name;
-        $rental->store_matricule=$request->store_matricule;
-        $rental->store_name=$request->store_name;
-        $rental->store_address=$request->store_address;
-        $rental->period_location=$request->period_location;
-        $rental->rental_date=$request->rental_date;
-        $rental->price_store=$request->price_store;
-        $rental->save();
+        $rental = Rental::create([
+
+            'client_name' =>$request->client_name ,
+            'store_matricule'=> $request->store_matricule ,
+            'store_address' => $request->store_address,
+            'period_location' =>$request->period_location ,
+            'rental_date' =>$request->rental_date ,
+            'price_store' => $request->price_store,
+        ]);
         return response()->json($rental, 201); // Return the created rental data with status code 201 (Created)
     }
    public function show($id){
@@ -56,15 +55,15 @@ class RentalController extends Controller
    public function update(Request $request, $id){
     $rental = Rental::find($id);
     if ($rental) {
-        $rental->client_name=$request->client_name;
-        $rental->store_matricule=$request->store_matricule;
-        $rental->store_name=$request->store_name;
-        $rental->store_address=$request->store_address;
-        $rental->period_location=$request->period_location;
-        $rental->rental_date=$request->rental_date;
-        $rental->price_store=$request->price_store;
-        $rental->update($request->all());
-        $rental->save();
+        $rental->update([
+
+            'client_name' =>$request->client_name ,
+            'store_matricule'=> $request->store_matricule ,
+            'store_address' => $request->store_address,
+            'period_location' =>$request->period_location ,
+            'rental_date' =>$request->rental_date ,
+            'price_store' => $request->price_store,
+        ]);
         return response()->json($rental);
     } else {
         return response()->json(['message' => 'Rental not found'], 404);
@@ -82,23 +81,25 @@ class RentalController extends Controller
    public function generateQrCode($id)
 {     $rental = Rental::find($id);
     $data = [
-        'store_id' => $rental->store_id,
-        'rent_expiration' => $rental->rent_expiration,
-        'payment_status' => $rental->payment_status,
-       
+        'client_name' =>$rental->client_name ,
+            'store_matricule'=> $rental->store_matricule ,
+            'store_address' => $rental->store_address,
+
     ];
 
-    $url = route('rental.qrcode', ['data' => json_encode($data)]);
 
+    $url = route('rental.qrcode', ['id' => $rental->id]);
+    $dataString = json_encode($data);
+    $urlString = $url;
     $renderer = new ImageRenderer(
-        new RendererStyle(400, 1, null, null, Fill::uniformColor(new Rgb(0, 255, 0), new Rgb(0, 0, 0) )),
+        new RendererStyle(200, 1, null, null, Fill::uniformColor(new Rgb(0, 255, 0), new Rgb(0, 0, 0) )),
         new ImagickImageBackEnd()
     );
 
     $writer = new Writer($renderer);
-    $qrCode = $writer->writeString($url);
+    $qrCode = $writer->writeString($urlString);
 
-    $filename = 'qrcode_'. time(). '.png';
+    $filename = 'qrcode_'. $rental->client_name. '.png';
     $filepath = public_path('qrcodes/'. $filename);
 
     file_put_contents($filepath, $qrCode);
@@ -124,23 +125,20 @@ class RentalController extends Controller
 }
     public function generatePdf($id)
     {
-        $rental = Rental::find($id);
+        $rental = Rental::findOrFail($id);
+    $qrCode = $this->generateQrCode($id);
+    $qrcodeData = $qrCode->getData(true);
+    $qrcodeUrl = $qrcodeData['qrcode_url'];
 
-        if ($rental) {
-            $qrCode = $this->generateQrCode($id);
 
-            $pdf = PDF::loadView('pdf.rental', [
-                'rental' => $rental,
-                'qrCode' => $qrCode,
-            ]);
+    $pdf = PDF::loadView('pdf.rental', [
+        'rental' => $rental,
+        'qrCode' => $qrcodeUrl,
+    ]);
 
-            return $pdf->download('rental_details_'. $rental->client_name. '.pdf');
-        } else {
-            return response()->json(['message' => 'Rental not found'], 404);
-        }
+    $fileName = 'rental_details_' . $rental->client_name . '.pdf';
+    return $pdf->download($fileName);
     }
 
-    //...
 }
 
-//

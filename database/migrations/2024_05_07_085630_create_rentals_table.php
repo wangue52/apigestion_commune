@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rentals', function (Blueprint $table) {
-            $table->id('rental_id'); // Assuming you want an auto-incrementing primary key
+            $table->id(); // Assuming you want an auto-incrementing primary key
             $table->string('client_name');
-            $table->string('store_matricule'); 
+            $table->integer('store_matricule');
             $table->string('store_name');
             $table->string('store_address');
             $table->integer('period_location'); // Assuming period_locon in days, weeks, etc.

@@ -42,15 +42,26 @@ Route::delete('stores/{id}', [StoreController:: class ,'destroy']);
 
 Route::group(['prefix' => 'blocs'], function ()  {
     Route::get('/', [BlocControler::class, 'index']);
-    Route::post('/', [BlocControler::class, 'stores']);
+    Route::post('/', [BlocControler::class, 'store']);
 
-    Route::get('/{bloc}', [BlocControler::class, 'show']);
-    Route::put('/{bloc}', [BlocControler::class, 'update']);
-    Route::delete('bloc/{id}', [BlocControler::class, 'destroy']);
+    Route::get('/{id}', [BlocControler::class, 'show']);
+    Route::put('/{id}', [BlocControler::class, 'update']);
+    Route::delete('/{id}', [BlocControler::class, 'destroy']);
 });
-    Route::prefix('rentals')->group(function () {
-        Route::get('/', [RentalController::class, 'index']);
-        Route::post('/', [RentalController::class, 'store']);
-    });
-    Route::get('rental/qrcode/{data}', 'RentalController@getQrCodeData')->name('rental.qrcode');
-    Route::get('rentals/{rental}/pdf', 'RentalController@generatePdf')->name('rentals.pdf');
+Route::prefix('rentals')->group(function () {
+    Route::get('/', [RentalController::class, 'index']);
+    Route::post('/', [RentalController::class, 'store']);
+    Route::get('/{id}', [RentalController::class, 'show'])->name('rental.qrcode');
+    Route::put('/{id}', [RentalController::class, 'update']);
+    Route::delete('/{id}', [RentalController::class, 'destroy']);
+    Route::get('/qrcode/{id}', [RentalController::class, 'generateQrCode']);
+    Route::post('/qrcode/data', [RentalController::class, 'getQrCodeData']);
+    Route::get('/pdf/{id}', [RentalController::class, 'generatePdf']);
+    // ... add more routes as needed
+});
+    // Route::prefix('rentals')->group(function () {
+    //     Route::get('/', [RentalController::class, 'index']);
+    //     Route::post('/', [RentalController::class, 'store']);
+    // });
+    // Route::get('rental/qrcode/{data}', 'RentalController@getQrCodeData')->name('rental.qrcode');
+    // Route::get('rentals/{rental}/pdf', 'RentalController@generatePdf')->name('rentals.pdf');
